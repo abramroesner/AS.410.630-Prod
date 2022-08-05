@@ -1,6 +1,8 @@
 # AS.410.630-Prod
 Group project for JHU course
+
 Final Group Project   
+
 What is expected:  
 You will be divided into teams of 3 or 4. The assignment is simple as described below, 
 but what I will be most looking at is how you work together and how you divide the tasks 
@@ -35,6 +37,7 @@ to the opposite strand, which is the reverse complement of the first strand.
 Specifications:   
 Write a Python program called orfs to find all the open reading frames (ORFs) in the 
 input sequence.  
+
 INPUT:  
 The program will take in as input a file, which will contain any number of DNA 
 sequences in the FASTA format:  
@@ -46,13 +49,15 @@ header contain sequence data.
 - Sequence data may contain white space, which should be ignored.  
 Ask the user for the minimum ORF to search for. The default is 50, which means your 
 program should print out all ORFs with at least 50 bases.  
+
 OUTPUT:   
-Print your output in FASTA format, with one header line for each ORF, followed by the 
-DNA in the ORF. The header should be the same as the header in the input file, 
+- Print your output in FASTA format, with one header line for each ORF, followed by the 
+DNA in the ORF. 
+- The header should be the same as the header in the input file, 
 followed by a bar "|" followed by  
-FRAME = indicates the frame number (1-6) 
-POS = is the genomic position of the start of the ORF (left end is base 1) 
-LEN = is the length of the ORF (in bases)  
+- FRAME = indicates the frame number (1-6) 
+- POS = is the genomic position of the start of the ORF (left end is base 1) 
+- LEN = is the length of the ORF (in bases)  
  
 If N = 4, 5 or 6, then POS should be a negative number that indicates the 
 position of the start of the ORF from the right end of the sequence.  
