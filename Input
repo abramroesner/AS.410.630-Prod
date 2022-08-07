@@ -1,1 +1,23 @@
-
+import re
+#The program will take in as input a file, which will contain any number of DNA 
+#sequences in the FASTA format:  
+def input_fasta(fileid):
+    with open(fileid, 'r') as f:
+        #defining variables and base states
+        catstring = ""
+        sequenceid = 0
+        sequencedict = {}  
+        for line in f: #start walking through each line of the file
+            #- Sequence data may contain white space, which should be ignored. 
+            #- Sequence data may be upper or lower case.  
+            line = line.replace(" ", "").upper()
+            #A line beginning with a ">" is the header line for the next sequence - All lines after the 
+            #header contain sequence data.  
+            if line.startswith('>'):
+                #- There will be any number of sequences per file.  
+                #- Sequences may be split over many lines
+                if sequenceid != 0:
+                    sequencedict[sequenceid] = catstring #once we have selected our sequences we can chain and store them in dictionary
+                sequenceid += line [1:-1]
+            sequencedict[sequenceid] = catstring
+        return sequencedict
