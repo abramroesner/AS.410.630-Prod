@@ -1,1 +1,38 @@
-
+#This function splits a sequence into 3-base codons starting with the first, second, or third base and outputs the ORF in FASTA format if detected
+def frame123(sequenceID, sequence, orfval):
+    #for loop faciliates the frame reading
+    for i in range(3):
+        #defining the current frame
+        frameNum = i + 1
+        #array stores codons split by the frame
+        frame = [sequence[start:start+3] for start in range(i,len(sequence),3)]
+        #pre-defining index of stop codon to the end of the array
+        stopIndex = len(frame)
+        #start codon recognition
+        if 'ATG' in frame:
+            #defining the index of the start codon and its position from the first base of the sequence
+            startIndex = frame.index('ATG')
+            startPos = 3 * startIndex + frameNum
+            #stop codon recognition updates the previous stopIndex
+            if 'TAA' in frame and frame.index('TAA') > startIndex:
+                stopIndex = frame.index('TAA')
+            if 'TAG' in frame and frame.index('TAG') < stopIndex and frame.index('TAG') > startIndex:
+                stopIndex = frame.index('TAG')
+            if 'TGA' in frame and frame.index('TGA') < stopIndex and frame.index('TGA') > startIndex:
+                stopIndex = frame.index('TGA')
+            #Calculating length of ORF and verifying if meets user defined minimum ORF length
+            orfLen = (stopIndex - startIndex + 1) * 3
+            if orfLen >= orfval:
+                #Formatting output header
+                print(">" + sequenceID + " | FRAME = " + str(frameNum) + " POS = " + str(startPos) + " LEN = " + str(orfLen))
+                #defining codon count to establish maximum number of codons per line
+                codon = 0
+                #Output codons from frame array within the ORF
+                for index in range(startIndex, stopIndex + 1):
+                    print(frame[index], " ", end = '')
+                    codon = codon + 1
+                    #Exceeding codon limit per line creates another line
+                    if codon == 15:
+                        print("\n")
+                        codon = 0
+                print("\n")
