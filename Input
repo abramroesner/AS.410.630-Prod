@@ -25,6 +25,6 @@ def input_fasta(fileid):
 #program should print out all ORFs with at least 50 bases. 
 fileid = input('Please Input FASTA FileID :')
 try:
-    orfval = int(input("(Default 50) Please Input the Minimum ORF Value: "))
+    minorfval = int(input("(Default 50) Please Input the Minimum ORF Value: "))
 except:
-    orfval = 50
+    minorfval = 50
