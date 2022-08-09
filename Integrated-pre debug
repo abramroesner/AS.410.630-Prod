@@ -6,9 +6,10 @@ import re
 def input_fasta(fileid):
 
     with open(fileid, 'r') as f:
+
         #defining variables and base states
         catstring = ""
-        sequenceid = 0
+        sequenceid = str(0)
         sequencedict = {}  
         for line in f: #start walking through each line of the file
             #- Sequence data may contain white space, which should be ignored. 
@@ -19,26 +20,26 @@ def input_fasta(fileid):
             if line.startswith('>'):
                 #- There will be any number of sequences per file.  
                 #- Sequences may be split over many lines
-                if sequenceid != 0:
+                if sequenceid != str(0):
                     sequencedict[sequenceid] = catstring #once we have selected our sequences we can chain and store them in dictionary
                 sequenceid += line [1:-1]
             sequencedict[sequenceid] = catstring
-        return sequencedict
-        
+    return sequencedict
 #Ask the user for the minimum ORF to search for. The default is 50, which means your 
 #program should print out all ORFs with at least 50 bases. 
+
 
 fileid = input('Please Input FASTA FileID :')
 try:
     minorfval = int(input("(Default 50) Please Input the Minimum ORF Value: "))
 except:
     minorfval = 50
+    
+#THIS IS WHERE IT JUST STOPS- HELP??
 
 #Realized the program needs to iterate through the file as a portion of input
 
 allsequence = input_fasta(fileid) #read the file
-
-NEWLINE
 
 #This function splits a sequence into 3-base codons starting with the first, second, or third base and outputs the ORF in FASTA format if detected
 
@@ -75,7 +76,7 @@ def frames(sequenceID, sequence, orfval):
                 stopIndex = frame.index('TAG')
             if 'TGA' in frame and frame.index('TGA') < stopIndex and frame.index('TGA') > startIndex:
                 stopIndex = frame.index('TGA')
-                
+
 #Frame 4 through 6
 
  #start codon recognition
