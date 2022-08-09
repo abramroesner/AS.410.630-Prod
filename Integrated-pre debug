@@ -1,0 +1,112 @@
+from lib2to3.pgen2.token import NEWLINE
+import re
+
+#The program will take in as input a file, which will contain any number of DNA sequences in the FASTA format and return the dictionary. 
+
+def input_fasta(fileid):
+
+    with open(fileid, 'r') as f:
+        #defining variables and base states
+        catstring = ""
+        sequenceid = 0
+        sequencedict = {}  
+        for line in f: #start walking through each line of the file
+            #- Sequence data may contain white space, which should be ignored. 
+            #- Sequence data may be upper or lower case.  
+            line = line.replace(" ", "").upper()
+            #A line beginning with a ">" is the header line for the next sequence - All lines after the 
+            #header contain sequence data.  
+            if line.startswith('>'):
+                #- There will be any number of sequences per file.  
+                #- Sequences may be split over many lines
+                if sequenceid != 0:
+                    sequencedict[sequenceid] = catstring #once we have selected our sequences we can chain and store them in dictionary
+                sequenceid += line [1:-1]
+            sequencedict[sequenceid] = catstring
+        return sequencedict
+        
+#Ask the user for the minimum ORF to search for. The default is 50, which means your 
+#program should print out all ORFs with at least 50 bases. 
+
+fileid = input('Please Input FASTA FileID :')
+try:
+    minorfval = int(input("(Default 50) Please Input the Minimum ORF Value: "))
+except:
+    minorfval = 50
+
+#Realized the program needs to iterate through the file as a portion of input
+
+allsequence = input_fasta(fileid) #read the file
+
+NEWLINE
+
+#This function splits a sequence into 3-base codons starting with the first, second, or third base and outputs the ORF in FASTA format if detected
+
+def frames(sequenceID, sequence, orfval):
+
+    #for loop faciliates the frame reading
+
+    for i in range(3):
+
+        #defining the current frame
+
+        frameNum = i + 1
+        #array stores codons split by the frame
+
+        frame = [sequence[start:start+3] for start in range(i,len(sequence),3)]
+
+        #pre-defining index of stop codon to the end of the array
+
+        stopIndex = len(frame)
+
+#Frame 1 through 3
+
+        #start codon recognition
+        if 'ATG' in frame:
+
+            #defining the index of the start codon and its position from the first base of the sequence
+            startIndex = frame.index('ATG')
+            startPos = 3 * startIndex + frameNum
+
+            #stop codon recognition updates the previous stopIndex
+            if 'TAA' in frame and frame.index('TAA') > startIndex:
+                stopIndex = frame.index('TAA')
+            if 'TAG' in frame and frame.index('TAG') < stopIndex and frame.index('TAG') > startIndex:
+                stopIndex = frame.index('TAG')
+            if 'TGA' in frame and frame.index('TGA') < stopIndex and frame.index('TGA') > startIndex:
+                stopIndex = frame.index('TGA')
+                
+#Frame 4 through 6
+
+ #start codon recognition
+        if 'CGT' in frame:
+
+            #defining the index of the start codon and its position from the first base of the sequence
+            startIndex = frame.index('CGT')
+            startPos = 3 * startIndex + frameNum
+
+            #stop codon recognition updates the previous stopIndex
+            if 'TAA' in frame and frame.index('GCC') > startIndex:
+                stopIndex = frame.index('GCC')
+            if 'TAG' in frame and frame.index('GCT') < stopIndex and frame.index('GCT') > startIndex:
+                stopIndex = frame.index('GCT')
+            if 'TGA' in frame and frame.index('GGC') < stopIndex and frame.index('GGC') > startIndex:
+                stopIndex = frame.index('GGC')
+
+            #Calculating length of ORF and verifying if meets user defined minimum ORF length
+
+            orfLen = (stopIndex - startIndex + 1) * 3
+            if orfLen >= orfval:
+                #Formatting output header
+                print(">" + sequenceID + " | FRAME = " + str(frameNum) + " POS = " + str(startPos) + " LEN = " + str(orfLen))
+                #defining codon count to establish maximum number of codons per line
+                codon = 0
+                #Output codons from frame array within the ORF
+                for index in range(startIndex, stopIndex + 1):
+                    print(frame[index], " ", end = '')
+                    codon = codon + 1
+                    #Exceeding codon limit per line creates another line
+                    if codon == 15:
+                        print("\n")
+                        codon = 0
+                print("\n")
