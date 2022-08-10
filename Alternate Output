@@ -1,0 +1,77 @@
+def frames1to6(sequenceID, sequence, orfval):
+    #creating arrays of start and stop codon indices
+    startCodon = []
+    stopCodon = []
+    for i in range(6):
+        #defining current frame
+        frameNum = i + 1
+        #Frames 4 - 6 have reverse complement of sequence
+        if frameNum == 4:
+            sequence = sequence[::-1]
+            seqList = list(sequence)
+            for base in range(len(seqList)):
+                if seqList[base] == 'A':
+                    seqList[base] = 'T'
+                elif seqList[base] == 'T':
+                    seqList[base] = 'A'
+                elif seqList[base] == 'C':
+                    seqList[base] = 'G'
+                elif seqList[base] == 'G':
+                    seqList[base] = 'C'
+            sequence = "".join(seqList)
+        #defining starting point for frame offset
+        if frameNum > 3:
+            startHere = i - 3
+        else:
+            startHere = i
+        #storing codons split by the frame
+        frame = [sequence[start:start+3] for start in range(startHere,len(sequence),3)]
+        #clear start and stop arrays in every frame
+        startCodon.clear()
+        stopCodon.clear()
+        #searching frame array for start and stop codons and appending them into respective arrays
+        for int in range(len(frame)):
+            if(frame[int] == 'ATG'):
+                startCodon.append(int)
+            elif(frame[int] == 'TAA' or frame[int] == 'TAG' or frame[int] == 'TGA'):
+                stopCodon.append(int)
+        #boolean used to determine which start codon is the beginning of a ORF
+        orfDetect = False
+        #searching arrays for ORF start and stop codons
+        #NEED TO FIND A WAY TO IGNORE PREVIOUS START CODONS THAT ARE BEFORE A STOP CODON
+        for a in range(len(startCodon)):
+            #stopIndex = len(frame)
+            #startIndex = startCodon[a]
+            for b in range(len(stopCodon)):
+                if stopCodon[b] > startCodon[a]:
+                    if orfDetect == False:
+                        startIndex = startCodon[a]
+                        stopIndex = stopCodon[b]
+                        orfDetect = True
+                        break
+                    else:
+                        break
+                else:
+                    if orfDetect == True:
+                        startIndex = startCodon[a]
+                        orfDetect = False
+            #calculating starting position and length of the ORF
+            if frameNum < 4:        
+                startPos = 3 * startIndex + frameNum
+            else:
+                startPos = (3 * startIndex + frameNum - 3)* -1
+            orfLen = (stopIndex - startIndex + 1) * 3
+            #formatting output header
+            if orfLen >= orfval:
+                #Use this to solve start codon issue
+                #print(str(startIndex) + " - " + str(stopIndex))
+                print(">" + sequenceID + " | FRAME = " + str(frameNum) + " POS = " + str(startPos) + " LEN = " + str(orfLen))
+                codonCount = 0
+                #output frames within ORF with a limit to number of codons per line
+                for index in range(startIndex, stopIndex + 1):
+                    print(frame[index], " ", end = '')
+                    codonCount = codonCount + 1
+                    if codonCount == 15:
+                        print("\n")
+                        codonCount = 0
+                print("\n")
