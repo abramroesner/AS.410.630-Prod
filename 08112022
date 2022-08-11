@@ -1,0 +1,149 @@
+from fileinput import filename
+from lib2to3.pgen2.token import NEWLINE
+from msilib import sequence
+import re
+
+#The program will take in as input a file, which will contain any number of DNA 
+#sequences in the FASTA format and return the dictionary 
+
+def input_fasta(fileid):
+
+    with open(fileid, 'r') as f:              
+        for line in f: #start walking through each line of the file
+            #- Sequence data may contain white space, which should be ignored. 
+            #- Sequence data may be upper or lower case.  
+            line = line.replace(" ", "").upper()
+            #A line beginning with a ">" is the header line for the next sequence - All lines after the 
+            #header contain sequence data. 
+            header= line.startswith('>')  
+
+            if line.startswith('>'):
+              lines= [line for line in fileid]
+              for line in f:
+                ...
+              if lines and lines[0] == header:
+                return True
+            else:
+                file= open(fileid, 'w')
+                file.write(header + ''.join([line for line in lines if not line == header]))
+                #- There will be any number of sequences per file.  
+                #- Sequences may be split over many lines
+        
+            sequenceid= open(fileid, 'r')
+        sequencedict= {sequenceid}
+        return sequencedict 
+        #The reason it wasn't working is because you can't call a variable defined inside a function unless you set it as a global variable. 
+NEWLINE
+
+#calling the function we just defined so it can connect the file to function 2 on the backend without having to print anything
+input_fasta('fileid')
+
+#Ask the user for the minimum ORF to search for. The default is 50, which means your 
+#program should print out all ORFs with at least 50 bases. 
+
+fileentry = input('Please Input FASTA FileID :')
+try:
+    minorfval = int(input("(Default 50) Please Input the Minimum ORF Value: "))
+except:
+    minorfval = 50
+
+#Realized the program needs to iterate through the file as a portion of input
+
+#eliminated reading the file step because file has already been read after calling the funciton
+
+
+
+def frames1to6(sequence, orfval):
+    #creating arrays of start and stop codon indices
+    startCodon = []
+    stopCodon = []
+
+    for i in range(1, 6): #put six since there's six frames we need to loop through. Also added 1 so it can begin on number 1
+        
+        #defining current frame
+        frameNum = i + 1
+        #Frames 4 - 6 have reverse complement of sequence
+        if frameNum == 4:
+            sequence = sequence[::-1]
+            seqList = list(sequence)
+            for base in range(len(seqList)):
+                if seqList[base] == 'A':
+                    seqList[base] = 'T'
+                elif seqList[base] == 'T':
+                    seqList[base] = 'A'
+                elif seqList[base] == 'C':
+                    seqList[base] = 'G'
+                elif seqList[base] == 'G':
+                    seqList[base] = 'C'
+            sequence = "".join(seqList)
+
+        #defining starting point for frame offset
+        if frameNum > 3:
+            startHere = i - 3
+        else:
+            startHere = i
+        #storing codons split by the frame
+
+        frame = [sequence[start:start+3] for start in range(startHere, len(str(sequence)), 3)]
+
+        #clear start and stop arrays in every frame
+        startCodon.clear()
+        stopCodon.clear()
+
+        #searching frame array for start and stop codons and appending them into respective arrays
+        for int in range(len(frame)):
+            if(frame[int] == 'ATG'):
+                startCodon.append(int)
+            elif(frame[int] == 'TAA' or frame[int] == 'TAG' or frame[int] == 'TGA'):
+                stopCodon.append(int)
+
+        #boolean used to determine which start codon is the beginning of a ORF
+        orfDetect = False
+
+        #searching arrays for ORF start and stop codons
+        #NEED TO FIND A WAY TO IGNORE PREVIOUS START CODONS THAT ARE BEFORE A STOP CODON
+        for a in range(len(startCodon)):
+            #stopIndex = len(frame)
+            #startIndex = startCodon[a]
+            for b in range(len(stopCodon)):
+                if stopCodon[b] > startCodon[a]:
+                    if orfDetect == False:
+                        startIndex = startCodon[a]
+                        stopIndex = stopCodon[b]
+                        orfDetect = True
+                        break
+                    else:
+                        break
+                else:
+                    if orfDetect == True:
+                        startIndex = startCodon[a]
+                        orfDetect = False
+            #calculating starting position and length of the ORF
+
+            if frameNum < 4:        
+                startPos = 3 * startIndex + frameNum
+            else:
+                startPos = (3 * startIndex + frameNum - 3)* -1
+            orfLen = (stopIndex - startIndex + 1) * 3
+            return startPos, orfLen, orfval
+           
+NEWLINE
+
+frames1to6(sequence, 'orfval')
+'''
+#formatting output header
+if orfLen >= orfval:
+#Use this to solve start codon issue
+ #print(str(startIndex) + " - " + str(stopIndex))
+    print(">" + sequenceID + " | FRAME = " + str(frameNum) + " POS = " + str(startPos) + " LEN = " + str(orfLen))
+codonCount = 0
+
+ #output frames within ORF with a limit to number of codons per line
+for index in range(startIndex, stopIndex + 1):
+ print(frame[index], " ", end = '')
+ codonCount = codonCount + 1
+if codonCount == 15:
+ print("\n")
+codonCount = 0
+print("\n")
+'''
