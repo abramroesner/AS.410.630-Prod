@@ -29,6 +29,4 @@ except:
 output = input_fasta(fileid)
 print(output)
 
-#Realized the program needs to iterate through the file as a portion of input
-allsequence = input_fasta(fileid) #read the file
 
