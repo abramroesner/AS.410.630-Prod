@@ -104,19 +104,19 @@ def frames1to6(sequenceID, sequence, orfVal):
                 print("\n")
     
 
-fileID = input("This program willl find ORFs for sequences. When prompted, please enter a FASTA file with 1 or more sequences.\nEnter FASTA file: ")
+fileID = input("This program willl find ORFs for sequences. When prompted, please enter a FASTA file with 1 or more sequences.\n\nEnter FASTA file: ")
 if existCheck(fileID) == True:
     openFile = open(fileID, 'r')
     fileContents = openFile.read()
     if fastaCheck(fileContents) == True:
-        orfVal = int(input("Enter minimum lenth in bp for ORFs: "))
+        orfVal = int(input("\nEnter minimum lenth in bp for ORFs: "))
         if orfVal < 50:
-            print("The value is less than the default limit, so it will be changed to 50.")
+            print("\nThe value is less than the default limit, so it will be changed to 50.")
             orfVal = 50
         seqDict = input_fasta(fileID)
         for key in seqDict:
             frames1to6(key, seqDict[key], orfVal)
     else:
-        print("File is not in FASTA format.")
+        print("\nFile is not in FASTA format.")
 else:
-    print("File does not exist.")
+    print("\nFile does not exist.")
