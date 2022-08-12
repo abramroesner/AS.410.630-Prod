@@ -1,0 +1,121 @@
+import re
+import os
+
+def existCheck(fileID):
+    fileExist = os.path.exists(fileID)
+    if fileExist == True:
+        return True
+    else:
+        return False
+
+def fastaCheck(fileContents):
+    fastaIndicator = ">" in fileContents
+    if fastaIndicator == True:
+        position = re.search(">", fileContents).start()
+        if position == 0:
+            return True
+        else:
+            return False
+    else:
+        return False
+    
+def input_fasta(fileid):
+    with open(fileid, 'r') as f:
+        sequencedict = {}
+        sequenceid = 0
+        catstring = ""  
+        for line in f: 
+            line = line.replace(" ", "").upper()  
+            if line.startswith('>'):
+                if sequenceid != 0:
+                    sequencedict[sequenceid] = catstring 
+                sequenceid = line[1:-1]
+                catstring = ""
+            else:
+                catstring += line[:-1]
+        sequencedict[sequenceid] = catstring
+    return sequencedict
+
+def frames1to6(sequenceID, sequence, orfVal):
+    startCodon = []
+    stopCodon = []
+    for i in range(6):
+        frameNum = i + 1
+        if frameNum == 4:
+            sequence = sequence[::-1]
+            seqList = list(sequence)
+            for base in range(len(seqList)):
+                if seqList[base] == 'A':
+                    seqList[base] = 'T'
+                elif seqList[base] == 'T':
+                    seqList[base] = 'A'
+                elif seqList[base] == 'C':
+                    seqList[base] = 'G'
+                elif seqList[base] == 'G':
+                    seqList[base] = 'C'
+            sequence = "".join(seqList)
+        if frameNum > 3:
+            startHere = i - 3
+        else:
+            startHere = i
+        frame = [sequence[start:start+3] for start in range(startHere,len(sequence),3)]
+        startCodon.clear()
+        stopCodon.clear()
+        for int in range(len(frame)):
+            if(frame[int] == 'ATG'):
+                startCodon.append(int)
+            elif(frame[int] == 'TAA' or frame[int] == 'TAG' or frame[int] == 'TGA'):
+                stopCodon.append(int)
+        #print("Frame " + str(frameNum) + " start and stop codon locations")
+        #print(startCodon)
+        #print(stopCodon)
+        #print("\n")
+        orfDetect = False
+        for a in range(len(startCodon)):
+            for b in range(len(stopCodon)):
+                if stopCodon[b] > startCodon[a]:
+                    if orfDetect == False:
+                        startIndex = startCodon[a]
+                        stopIndex = stopCodon[b]
+                        orfDetect = True
+                        break
+                    else:
+                        break
+                else:
+                    if orfDetect == True:
+                        startIndex = startCodon[a]
+                        orfDetect = False
+            if frameNum < 4:        
+                startPos = 3 * startIndex + frameNum
+            else:
+                startPos = (3 * startIndex + frameNum - 3)* -1
+            orfLen = (stopIndex - startIndex + 1) * 3
+            if orfLen >= orfVal:
+                #print("ORF is located between indices " + str(startIndex) + " - " + str(stopIndex) + " in the start and stop codon arrays.")
+                print(">" + sequenceID + " | FRAME = " + str(frameNum) + " POS = " + str(startPos) + " LEN = " + str(orfLen))
+                codonCount = 0
+                for index in range(startIndex, stopIndex + 1):
+                    print(frame[index], " ", end = '')
+                    codonCount = codonCount + 1
+                    if codonCount == 15:
+                        print("\n")
+                        codonCount = 0
+                print("\n")
+    
+
+fileID = input("This program will find ORFs for sequences. When prompted, please enter a FASTA file with 1 or more sequences.\nEnter FASTA file: ")
+if existCheck(fileID) == True:
+    openFile = open(fileID, 'r')
+    fileContents = openFile.read()
+    if fastaCheck(fileContents) == True:
+        orfVal = int(input("(Default 50) Enter minimum lenth in bp for ORFs: "))
+        if orfVal < 50:
+            print("The value is less than the default limit, so it will be changed to 50.")
+            orfVal = 50
+        seqDict = input_fasta(fileID)
+        for key in seqDict:
+            frames1to6(key, seqDict[key], orfVal)
+    else:
+        print("File is not in FASTA format.")
+else:
+    print("File does not exist.")
