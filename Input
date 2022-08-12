@@ -1,38 +1,33 @@
 import re
-
-#The program will take in as input a file, which will contain any number of DNA 
-#sequences in the FASTA format and return the dictionary 
-
+ 
 def input_fasta(fileid):
 
     with open(fileid, 'r') as f:
-        #defining variables and base states
-        catstring = ""
+        sequencedict = {}
         sequenceid = 0
-        sequencedict = {}  
-        for line in f: #start walking through each line of the file
-            #- Sequence data may contain white space, which should be ignored. 
-            #- Sequence data may be upper or lower case.  
-            line = line.replace(" ", "").upper()
-            #A line beginning with a ">" is the header line for the next sequence - All lines after the 
-            #header contain sequence data.  
+        catstring = ""  
+        for line in f: 
+            line = line.replace(" ", "").upper()  
             if line.startswith('>'):
-                #- There will be any number of sequences per file.  
-                #- Sequences may be split over many lines
                 if sequenceid != 0:
-                    sequencedict[sequenceid] = catstring #once we have selected our sequences we can chain and store them in dictionary
-                sequenceid += line [1:-1]
-            sequencedict[sequenceid] = catstring
-        return sequencedict
-        
-#Ask the user for the minimum ORF to search for. The default is 50, which means your 
-#program should print out all ORFs with at least 50 bases. 
+                    sequencedict[sequenceid] = catstring 
+                sequenceid = line[1:-1]
+                catstring = ""
+            else:
+                catstring += line[:-1]
+
+        sequencedict[sequenceid] = catstring
+
+    return sequencedict
 
 fileid = input('Please Input FASTA FileID :')
 try:
-    minorfval = int(input("(Default 50) Please Input the Minimum ORF Value: "))
+    orfval = int(input("(Default 50) Please Input the Minimum ORF Value: "))
 except:
-    minorfval = 50
+    orfval = 50
+    
+output = input_fasta(fileid)
+print(output)
 
 #Realized the program needs to iterate through the file as a portion of input
 allsequence = input_fasta(fileid) #read the file
