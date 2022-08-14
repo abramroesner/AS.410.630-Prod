@@ -1,13 +1,12 @@
+#Abram Roesner, Pow Rotger, Jonathan Banh
+#8/13/22
+#Group Project
+
 import re
 import os
 
-def existCheck(fileID):
-    fileExist = os.path.exists(fileID)
-    if fileExist == True:
-        return True
-    else:
-        return False
-
+#Jonathan Banh
+#Function checks file for FASTA format
 def fastaCheck(fileContents):
     fastaIndicator = ">" in fileContents
     if fastaIndicator == True:
@@ -18,14 +17,16 @@ def fastaCheck(fileContents):
             return False
     else:
         return False
-    
+
+#Abram Roesner
+#Function creates a dictionary and converts headers to keys and sequences to values
 def input_fasta(fileid):
     with open(fileid, 'r') as f:
         sequencedict = {}
         sequenceid = 0
         catstring = ""  
         for line in f: 
-            line = line.replace(" ", "").upper()  
+            line = line.replace(" ", "").upper()
             if line.startswith('>'):
                 if sequenceid != 0:
                     sequencedict[sequenceid] = catstring 
@@ -35,12 +36,23 @@ def input_fasta(fileid):
                 catstring += line[:-1]
         sequencedict[sequenceid] = catstring
     return sequencedict
-
+    
+#Jonathan Banh and Pow Rotger
+#Function does the following:
+#-creates arrays for start and stop codon indices
+#-establishes reading frames with their own offsets
+#-converts sequence to reverse complement in frames 4 - 6
+#-stores codons split by reading frames in an array
+#-compares start and stop codon indices within frame array to find ORFs
+#-outputs frame number in which ORF was found, its length and starting position, and codons
 def frames1to6(sequenceID, sequence, orfVal):
+    #create arrays for start and stop codon indices
     startCodon = []
     stopCodon = []
     for i in range(6):
+        #define current frame
         frameNum = i + 1
+        #Frames 4 - 6 use the reverse complement of sequence
         if frameNum == 4:
             sequence = sequence[::-1]
             seqList = list(sequence)
@@ -54,22 +66,25 @@ def frames1to6(sequenceID, sequence, orfVal):
                 elif seqList[base] == 'G':
                     seqList[base] = 'C'
             sequence = "".join(seqList)
+        #define starting point for frame offset
         if frameNum > 3:
             startHere = i - 3
         else:
             startHere = i
+        #store codons split by the frame in a separate array
         frame = [sequence[start:start+3] for start in range(startHere,len(sequence),3)]
+        #clear start and stop codon arrays in every frame
         startCodon.clear()
         stopCodon.clear()
+        #search frame array for start and stop codons and append them to their respective arrays
         for int in range(len(frame)):
             if(frame[int] == 'ATG'):
                 startCodon.append(int)
             elif(frame[int] == 'TAA' or frame[int] == 'TAG' or frame[int] == 'TGA'):
                 stopCodon.append(int)
-        #print("Frame " + str(frameNum) + " start and stop codon locations")
-        #print(startCodon)
-        #print(stopCodon)
-        #print("\n")
+        #boolean used to determine which start codon is the beginning of an ORF
+        #for loops compare indices of start and stop codons to find ORFs
+        #**Output includes nested ORFs**
         orfDetect = False
         for a in range(len(startCodon)):
             for b in range(len(stopCodon)):
@@ -85,15 +100,18 @@ def frames1to6(sequenceID, sequence, orfVal):
                     if orfDetect == True:
                         startIndex = startCodon[a]
                         orfDetect = False
+            #calculate the starting position and length of ORF
             if frameNum < 4:        
                 startPos = 3 * startIndex + frameNum
             else:
                 startPos = (3 * startIndex + frameNum - 3)* -1
             orfLen = (stopIndex - startIndex + 1) * 3
+            #format output header
             if orfLen >= orfVal:
-                #print("ORF is located between indices " + str(startIndex) + " - " + str(stopIndex) + " in the start and stop codon arrays.")
                 print(">" + sequenceID + " | FRAME = " + str(frameNum) + " POS = " + str(startPos) + " LEN = " + str(orfLen))
+                #create counter variable for codon limit per line in output
                 codonCount = 0
+                #format output of codons in ORF
                 for index in range(startIndex, stopIndex + 1):
                     print(frame[index], " ", end = '')
                     codonCount = codonCount + 1
@@ -101,21 +119,21 @@ def frames1to6(sequenceID, sequence, orfVal):
                         print("\n")
                         codonCount = 0
                 print("\n")
-    
 
-fileID = input("This program will find ORFs for sequences. When prompted, please enter a FASTA file with 1 or more sequences.\nEnter FASTA file: ")
-if existCheck(fileID) == True:
+#Program asks user to input the name of a FASTA file and the minimum length of ORFs (default = 50) to call functions
+fileID = input("This program willl find ORFs for sequences. When prompted, please enter a FASTA file with 1 or more sequences.\n\nEnter FASTA file: ")
+if os.path.exists(fileID) == True:
     openFile = open(fileID, 'r')
     fileContents = openFile.read()
     if fastaCheck(fileContents) == True:
-        orfVal = int(input("(Default 50) Enter minimum lenth in bp for ORFs: "))
+        orfVal = int(input("\nEnter minimum lenth in bp for ORFs: "))
         if orfVal < 50:
-            print("The value is less than the default limit, so it will be changed to 50.")
+            print("\nThe value is less than the default limit, so it will be changed to 50.")
             orfVal = 50
         seqDict = input_fasta(fileID)
         for key in seqDict:
             frames1to6(key, seqDict[key], orfVal)
     else:
-        print("File is not in FASTA format.")
+        print("\nFile is not in FASTA format.")
 else:
-    print("File does not exist.")
+    print("\nFile does not exist.")
