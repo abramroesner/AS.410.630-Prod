@@ -1,4 +1,4 @@
-#Abram Roesner, Pow Rotger, Jonathan Banh
+#Abram Roesner, Pau Rotger-Gonzalez, Jonathan Banh
 #8/13/22
 #Group Project
 
@@ -37,7 +37,7 @@ def input_fasta(fileid):
         sequencedict[sequenceid] = catstring
     return sequencedict
     
-#Jonathan Banh and Pow Rotger
+#Jonathan Banh and Pau Rotger-Gonzalez
 #Function does the following:
 #-creates arrays for start and stop codon indices
 #-establishes reading frames with their own offsets
