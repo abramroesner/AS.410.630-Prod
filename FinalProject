@@ -45,6 +45,7 @@ def input_fasta(fileid):
 #-stores codons split by reading frames in an array
 #-compares start and stop codon indices within frame array to find ORFs
 #-outputs frame number in which ORF was found, its length and starting position, and codons
+#**Output includes nested ORFs**
 def frames1to6(sequenceID, sequence, orfVal):
     #create arrays for start and stop codon indices
     startCodon = []
@@ -84,7 +85,6 @@ def frames1to6(sequenceID, sequence, orfVal):
                 stopCodon.append(int)
         #boolean used to determine which start codon is the beginning of an ORF
         #for loops compare indices of start and stop codons to find ORFs
-        #**Output includes nested ORFs**
         orfDetect = False
         for a in range(len(startCodon)):
             for b in range(len(stopCodon)):
