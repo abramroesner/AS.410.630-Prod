@@ -22,12 +22,16 @@ def fastaCheck(fileContents):
 #Function creates a dictionary and converts headers to keys and sequences to values
 def input_fasta(fileid):
     with open(fileid, 'r') as f:
+    #defining variables and base states
         sequencedict = {}
         sequenceid = 0
         catstring = ""  
-        for line in f: 
+        for line in f:
+            #cut out white space and make everything uppercase
             line = line.replace(" ", "").upper()
+            #Define header location and indicate sequence after
             if line.startswith('>'):
+                #Unlimited sequences and split over many lines to be concatenated
                 if sequenceid != 0:
                     sequencedict[sequenceid] = catstring 
                 sequenceid = line[1:-1]
