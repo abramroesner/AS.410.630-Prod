@@ -1,41 +1,5 @@
 # AS.410.630-Prod
-Group project for JHU course
-
-Final Group Project   
-
-What is expected:  
-You will be divided into teams of 3 or 4. The assignment is simple as described below, 
-but what I will be most looking at is how you work together and how you divide the tasks 
-among yourselves. At the end of the semester I will ask each of you to evaluate your 
-other team mates performance. You will be asked to email me directly and give each of 
-them a score (from 1 to 10) representing how much they contributed.  Keep in mind that 
-everyone has to code! Meaning someone can’t just write the report and say that was  
-his\her contribution! You need to meet with your group and decide how to divide up the 
-program into functions and then who will do which one. All of this interaction should 
-occur in Black Board (the group’s discussion board). If you chat outside of Black Board 
-then please post a transcript of your chat in there for me to see (and a record for 
-yourselves as well).  
-Deliverable:  
-Each group will submit a 1-2 page report (not including the code), summarizing the work 
-they did to solve the problem (including how the problem was divided up among the 
-group members), what obstacles they had, and any future improvements that need to 
-be made. The code should be fully documented and well commented. For every 
-function the name of the primary author(s) should be included (as comments).  
-Project Description:  
-Given the genomic sequences for an organism; one of the first steps in identifying the 
-genes is to identify the open reading frames (ORFs). An open reading frame is a 
-maximal length sequence of the DNA that starts with a start codon ATG and ends with a  
-stop codon (TAA, TAG or TGA). In prokaryotes, genes may occur within ORFs. In 
-eukaryotes, the story is complicated by the presence of introns that are spliced out of 
-the mRNA before translation. In this assignment, you will write a Python program that 
-finds all the ORFs in a genomic sequence.   
-A genomic sequence has 6 reading frames, corresponding to the six possible ways of 
-translating the sequence into three-letter codons. Frame 1 treats each group of three 
-bases as a codon, starting from the first base. Frame 2 starts at the second base, and 
-frame 3 starts at the third base. Frames 4, 5 and 6 are defined in a similar way, but refer 
-to the opposite strand, which is the reverse complement of the first strand.  
-Specifications:   
-Write a Python program called orfs to find all the open reading frames (ORFs) in the 
+A Python program called orfs to find all the open reading frames (ORFs) in the 
 input sequence.  
 
 INPUT:  
